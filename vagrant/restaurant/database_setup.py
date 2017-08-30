@@ -12,6 +12,13 @@ class Restaurant(Base):
     name = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
 
+    @property
+    def serialize(self):
+        '''Returns MenuItem object data in easily serializeable format'''
+        return {
+            'name': self.name
+        }
+
 class MenuItem(Base):
     __tablename__ = 'menu_item'
     name = Column(String(80), nullable=False)
@@ -24,7 +31,7 @@ class MenuItem(Base):
 
     @property
     def serialize(self):
-        # Returns object data in easily serializeable format
+        '''Returns MenuItem object data in easily serializeable format'''
         return {
             'name': self.name,
             'description': self.description,
