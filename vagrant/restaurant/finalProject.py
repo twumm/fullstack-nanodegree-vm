@@ -111,26 +111,29 @@ def editMenuItem(restaurant_id, menu_id):
     # TODO -- check how the menu to edit is being picked?
     menu_to_edit = session.query(MenuItem).filter_by(id=menu_id).one()
     if request.method == 'POST':
-        if request.form:
-            menu_to_edit.name = MenuItem(name=request.form['menuName'])
-            menu_to_edit.course = MenuItem(course=request.form['menuCourse'])
-            menu_to_edit.description = MenuItem(cdescription=request.form['menuDescription'])
-        '''edited_menu_item = MenuItem(name=request.form['menuName'],
-                                 course=request.form['menuCourse'],
-                                 description=request.form['menuDescription'],
-                                 price=request.form['menuPrice'],
-                                 restaurant_id=restaurant_id, id=menu_id)'''
+        menu_to_edit.name = request.form['menuName']
+        menu_to_edit.course = request.form['menuCourse']
+        menu_to_edit.description = request.form['menuDescription']
+        menu_to_edit.price = request.form['menuPrice']
         session.add(menu_to_edit)
         session.commit()
         return redirect(url_for('showMenu', restaurant_id=restaurant_id))
     else:
-        return render_template('editMenuItem.html', restaurant_id=restaurant_id, menu_id=menu_id, menu=menu_to_edit)
+        return render_template('editMenuItem.html', restaurant_id=restaurant_id,
+                               menu_to_edit=menu_to_edit)
     # return "This page is for editing menu item %s" %menu_id
 
 # delete a menu item
 @app.route('/restaurant/<int:restaurant_id>/<int:menu_id>/delete/', methods=['GET', 'POST'])
 def deleteMenuItem(restaurant_id, menu_id):
-    return render_template('deleteMenuItem.html', restaurant_id=restaurant_id, menu_id=menu_id, menuItems=items)
+    menu_to_delete = session.query(MenuItem).filter_by(id=menu_id).one()
+    if request.method == 'POST':
+        session.delete(menu_to_delete)
+        session.commit()
+        return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+    else:
+        return render_template('deleteMenuItem.html', restaurant_id=restaurant_id,
+                               menu_id=menu_id, menu_to_delete=menu_to_delete)
     # return "This page is for deleing menu item %s" %menu_id
 
 if __name__ == '__main__':
