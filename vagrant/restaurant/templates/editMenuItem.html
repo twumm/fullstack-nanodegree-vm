@@ -6,19 +6,24 @@
 </head>
 
 <body>
-    <form action="{{url_for('editMenuItem', restaurant_id=restaurant_id, menu_id=menu_id)}}" method="POST">
+    <form action="{{url_for('editMenuItem', restaurant_id=restaurant_id, menu_id=menu_to_edit.id)}}" method="POST">
 
         <p>Name:</p>
-        <input type="text" size="30" name="menuName" placeholder="{{menu.name}}">
+        <input type="text" size="30" name="menuName" placeholder="{{menu_to_edit.name}}">
 
         <p>Course:</p>
-        <input type="text" size="30" name="menuCourse" placeholder="{{menu.course}}">
+        <fieldset id="course">
+            <input type="radio" value="Appetizer" name="menuCourse">Appetizer
+            <input type="radio" value="Entree" name="menuCourse">Entree
+            <input type="radio" value="Dessert" name="menuCourse">Dessert
+            <input type="radio" value="Beverage" name="menuCourse">Beverage
+        </fieldset>
 
         <p>Description:</p>
-        <input type="text" size="30" name="menuDescription" placeholder="{{menu.description}}">
+        <input type="text" size="30" name="menuDescription" placeholder="{{menu_to_edit.description}}">
 
         <p>Price:</p>
-        <input type="text" size="8" name="menuPrice" placeholder="{{menu.price}}">
+        <input type="text" size="8" name="menuPrice" placeholder="{{menu_to_edit.price}}">
 
         <input type="submit" value="Save">
     </form>
