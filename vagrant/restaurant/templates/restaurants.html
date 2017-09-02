@@ -6,7 +6,7 @@
 </head>
 
 <body>
-    <h2 class="title">The Hottest Restaurants in town are: </h2>
+    <h2 class="title">Select a restaurant to view the menu: </h2>
     <div id="new-item">
         <a class="create-new" href="{{url_for('newRestaurant')}}">Create New Restaurant</a>
     </div>
@@ -20,7 +20,7 @@
     <div id="card-area">
         {% for item in restaurants %}
         <div class="item-card">
-            <h2>{{ item.name }}</h2>
+            <h2><a href="{{url_for('showMenu', restaurant_id=item.id)}}">{{ item.name }}</a></h2>
             <div class="item-card-bottom">
                 <a href="{{url_for('editRestaurant', restaurant_id=item.id)}}">Edit</a>
                 <a href="{{url_for('deleteRestaurant', restaurant_id=item.id)}}">Delete</a>
