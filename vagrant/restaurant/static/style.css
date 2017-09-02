@@ -36,8 +36,6 @@ body {
     min-height: 200px;
     background-color: #E80D2B;
     color: #fff;
-    /*display: block;
-    float: left;*/
     margin: 20px;
     padding: 5px;
     text-align: center;
@@ -47,6 +45,11 @@ body {
 .item-card:hover {
     /* shadow display on mouse-over */
     box-shadow: 0 8px 16px 0 black;
+}
+
+#card-area a {
+    text-decoration: none;
+    color: white;
 }
 
 .item-card-bottom {
