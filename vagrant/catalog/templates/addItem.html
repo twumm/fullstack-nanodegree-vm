@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Show Item:Description</title>
+</head>
+
+<body>
+    <!--add item-->
+    <div>
+        <h2>{{category_selected.name}}</h2>
+        <h5>Add Details of New Items here</h5>
+        <form action="{{url_for('add_item', category=category_selected.name )}}" method="POST">
+
+            <p>Name:</p>
+            <input type="text" size="30" name="newItem">
+
+            <p>Description:</p>
+            <input type="text" size="60" name="newItemDescription">
+
+            <input type="submit" value="Create">
+
+            <a href="{{url_for('specific_category', category=category_selected.name)}}">Cancel</a>
+
+        </form>
+    </div>
+    <br>
+
+</body>
+
+</html>

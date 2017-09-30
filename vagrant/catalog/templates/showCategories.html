@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Show Categories</title>
+</head>
+
+<body>
+    <!--test out the category drop-down select form-->
+
+    <!--<form name="categories" action="" method="POST">
+        <div align="center">
+        <div>
+            <select id="select-categories">
+                <option value="" selected>Pick a Category</option>
+                {% for category in categories %}
+                <option value="{{url_for('specific_category', category=category.name)}}">{{category.name}}</option>
+                <option value="www.google.com">{{category.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>-->
+
+    <!--list categories-->
+    <div>
+        {% for category in categories %}
+        <a href="{{url_for('specific_category', category=category.name)}}">
+            <li>{{category.name}}</li>
+        </a>
+        {% endfor %}
+    </div>
+    <br>
+    <div>
+        <p>Latest Items</p>
+        {% for item in items %}
+        <li>{{item.name}} ({{item.category.name}})</li>
+        {% endfor %}
+    </div>
+
+
+    <!--js starts here-->
+    <!--from stackoverflow https://stackoverflow.com/questions/5150363/onchange-open-url-via-select-jquery-->
+    <script>
+        $(function() {
+            // bind change event to select
+            $('#select-categories').on('change', function() {
+                var url = $(this).val(); // get the selected value
+                if (url) { // require a URL
+                    window.location = url; // redirect
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
