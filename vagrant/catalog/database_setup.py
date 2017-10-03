@@ -14,7 +14,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
     picture = Column(String(250))
-    email = Column(String)
+    email = Column(String(100))
 
 
 class Category(Base):
@@ -25,6 +25,13 @@ class Category(Base):
     name = Column(String(80), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+
+    @property
+    def serialize(self):
+        '''Returns a json of the category requested'''
+        return {
+        'name': self.name
+    }
 
 
 class Item(Base):
@@ -39,6 +46,14 @@ class Item(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
     date_added = Column(DateTime, default=datetime.datetime.utcnow)
+
+    @property
+    def serialize(self):
+        '''Returns a json of the item requested'''
+        return {
+        'name': self.name,
+        'description': self.description
+    }
 
 
 engine = create_engine('sqlite:///itemcatalog.db')

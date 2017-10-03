@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Show Item:Description</title>
+    <title>Edit Item</title>
 </head>
 
 <body>
@@ -20,7 +20,7 @@
 
             <input type="submit" value="Save">
 
-            <a href="{{url_for('specific_item', category=category_selected.name, item=item_to_edit.name)}}">Cancel</a>
+            <a href="{{url_for('specific_category', category=category_selected.name)}}">Cancel</a>
 
         </form>
     </div>

@@ -5,12 +5,129 @@ from database_setup import Base, Category, Item, User
 
 app = Flask(__name__)
 
+# modules for login
+from flask import session as login_session
+import random, string
+
+# modules for gconnect
+from oauth2client.client import flow_from_clientsecrets
+from oauth2client.client import FlowExchangeError
+import httplib2
+import json
+from flask import make_response
+import requests
+
+
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+
 # Connect to the database and create a db sessionmaker
 engine = create_engine('sqlite:///itemcatalog.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+@app.route('/category/json')
+def category_json():
+    '''Returns a json of the categories'''
+    categories = session.query(Category).all()
+    return jsonify(Categories=[category.serialize for category in categories])
+
+
+# TODO
+# @app.route('/category/<string:category>/json')
+# def category_item_json(category, item):
+#     '''Return a json of items in a category'''
+#     category_selected = session.query(Category).filter_by(name=category).one()
+#     items = session.query(Item).filter_by(name=item).all()
+#     return jsonify(Items=[item.serialize for item in items])
+
+
+# State token to prevent request forgery
+@app.route('/login')
+def do_login():
+    '''Logins user using OAuth2'''
+    state = ''.join(random.choice(string.ascii_uppercase+string.digits) for x in xrange(32))
+    login_session['state'] = state
+    return render_template('login.html', STATE=state)
+    # return "The current session state is %s" %login_session['state']
+
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+    '''Checks and validates google login process to prevent fraud, among other things'''
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state secret'), 401)
+        response.header['Content-Type'] = 'application/json'
+        return response
+    code = request.data
+    try:
+        # Upgrade authorization code into a credentials object
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(json.dumps('Failed to upgrade the authorization code'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Check that the access token is valid.
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1])
+    # if the result has an error, abort
+    if result.get('error') is not None:
+        response = make_response(json.dumps(result.get('error'), 500))
+        response.headers['Content-Type'] = 'application/json'
+    # Verify that the access token is used for the intended user
+    gplus_id = credentials.id_token['sub']
+    if result['user_id'] != gplus_id:
+        response = make_response(
+            json.dumps("Token's user ID doesn't match given user ID"), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Verify that the access token is valid for this app
+    if result['issued_to'] != CLIENT_ID:
+        response = make_response(
+            json.dumps("Token's client ID does not match app's"), 401)
+        print "Token's client ID does not match app's."
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Check if a user is already logged in
+    stored_credentials = login_session.get('credentials')
+    stored_gplus_id = login_session.get('gplus_id')
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected'), 200)
+        response.header['Content-Type'] = 'application/json'
+
+    # Store the access token in the session for later use
+    login_session['credentials'] = credentials
+    login_session['gplus_id'] = gplus_id
+
+    # Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+    data = json.loads(answer.text)
+
+    # save the preferred user data
+    login_session['username'] = data["name"]
+    login_session['picture'] = data["picture"]
+    # login_session['email'] = data["email"]
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += ' " style = "width: 300px; height: 300px; border-radius: '\
+              '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
+    flash("you are now logged in as %s" %login_session['username'])
+    return output
+
 
 @app.route('/')
 @app.route('/category/')
@@ -32,6 +149,44 @@ def specific_category(category):
     items = session.query(Item).filter_by(category_id=category.id).all()
     return render_template('showSpecificCategory.html', category=category, items=items)
     # return "This will display list of category %s items" %(category)
+
+
+@app.route('/category/add', methods=['GET', 'POST'])
+def add_category():
+    '''Adds a new category'''
+    if request.method == 'POST':
+        new_category_name = request.form['newCategoryName']
+        new_category = Category(name=new_category_name)
+        session.add(new_category)
+        session.commit()
+        return redirect(url_for('show_categories'))
+    else:
+        return render_template('addCategory.html')
+
+
+@app.route('/category/<string:category_name>/edit', methods=['GET', 'POST'])
+def edit_category(category_name):
+    '''Edit a category'''
+    category_to_edit = session.query(Category).filter_by(name=category_name).one()
+    if request.method == 'POST':
+        category_to_edit.name = request.form['editedCategoryName']
+        session.add(category_to_edit)
+        session.commit()
+        return redirect(url_for('show_categories'))
+    else:
+        return render_template('editCategory.html', category_to_edit=category_to_edit)
+
+
+@app.route('/category/<string:category_name>/delete/', methods=['GET', 'POST'])
+def delete_category(category_name):
+    '''Delete a category'''
+    category_to_delete = session.query(Category).filter_by(name=category_name).first()
+    if request.method == 'POST':
+        session.delete(category_to_delete)
+        session.commit()
+        return redirect(url_for('show_categories'))
+    else:
+        return render_template('deleteCategory.html', category_to_delete=category_to_delete)
 
 
 @app.route('/category/<string:category>/<string:item>', methods=['GET', 'POST'])
@@ -98,5 +253,6 @@ def delete_item(category, item):
 
 # Run application on localhost
 if __name__ == '__main__':
+    app.secret_key = 'super_secret_key'
     app.debug = True
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=5000)

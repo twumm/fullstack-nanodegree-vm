@@ -27,7 +27,13 @@
         <a href="{{url_for('specific_category', category=category.name)}}">
             <li>{{category.name}}</li>
         </a>
-        {% endfor %}
+        <a href="{{url_for('edit_category', category_name=category.name)}}">
+            <h6>Edit</h6>
+        </a>
+        <a href="{{url_for('delete_category', category_name=category.name)}}">
+            <h6>Delete</h6>
+        </a>
+        <br> {% endfor %}
     </div>
     <br>
     <div>
@@ -36,11 +42,16 @@
         <li>{{item.name}} ({{item.category.name}})</li>
         {% endfor %}
     </div>
+    <br>
+    <!--Add category button-->
+    <div>
+        <a href="{{url_for('add_category')}}">Add New Category</a>
+    </div>
 
 
     <!--js starts here-->
     <!--from stackoverflow https://stackoverflow.com/questions/5150363/onchange-open-url-via-select-jquery-->
-    <script>
+    <!--<script>
         $(function() {
             // bind change event to select
             $('#select-categories').on('change', function() {
@@ -50,7 +61,7 @@
                 }
             });
         });
-    </script>
+    </script>-->
 </body>
 
 </html>
