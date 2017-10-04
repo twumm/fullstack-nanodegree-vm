@@ -89,8 +89,7 @@ def gconnect():
         return response
     # Verify that the access token is valid for this app
     if result['issued_to'] != CLIENT_ID:
-        response = make_response(
-            json.dumps("Token's client ID does not match app's"), 401)
+        response = make_response(json.dumps("Token's client ID does not match app's"), 401)
         print "Token's client ID does not match app's."
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -102,7 +101,7 @@ def gconnect():
         response.header['Content-Type'] = 'application/json'
 
     # Store the access token in the session for later use
-    login_session['credentials'] = credentials
+    login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
 
     # Get user info
@@ -114,7 +113,7 @@ def gconnect():
     # save the preferred user data
     login_session['username'] = data["name"]
     login_session['picture'] = data["picture"]
-    # login_session['email'] = data["email"]
+    login_session['email'] = data["email"]
 
     output = ''
     output += '<h1>Welcome, '
