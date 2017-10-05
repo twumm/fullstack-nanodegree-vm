@@ -18,10 +18,12 @@
     <div id="result"></div>
 
     <script>
+        // what is in authResult? did we define it ourselves?
         function signInCallback(authResult) {
             if (authResult['code']) {
                 // Hide the login button
                 $('#signinButton').attr('style', 'display:none');
+
                 // Send the one-time-use code to the server, if the server responds,
                 // write a 'login successful' message to the web page and then redirect
                 // back to the main category page
