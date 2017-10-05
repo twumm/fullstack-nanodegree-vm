@@ -21,7 +21,7 @@ import requests
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
 # Connect to the database and create a db sessionmaker
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('sqlite:///itemcatalogwithusers.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -61,12 +61,12 @@ def gconnect():
         response = make_response(json.dumps('Invalid state secret'), 401)
         response.header['Content-Type'] = 'application/json'
         return response
-    code = request.data
+    code = request.data # this is a json.
     try:
         # Upgrade authorization code into a credentials object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-        oauth_flow.redirect_uri = 'postmessage' #what does this mean/do?
-        credentials = oauth_flow.step2_exchange(code) #what does this mean/do?
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
         # if credentials is None:
         #     print "It is empty"
     except FlowExchangeError:
@@ -77,13 +77,13 @@ def gconnect():
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url, 'GET')[1]) # does the result contain the user information?
+    result = json.loads(h.request(url, 'GET')[1])
     # if the result has an error, abort
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error'), 500))
         response.headers['Content-Type'] = 'application/json'
     # Verify that the access token is used for the intended user
-    gplus_id = credentials.id_token['sub'] # how can I view the values in credentials?
+    gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
         response = make_response(
             json.dumps("Token's user ID doesn't match given user ID"), 401)
@@ -96,8 +96,8 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     # Check if a user is already logged in
-    stored_credentials = login_session.get('credentials') # how can I view the values in credentials?
-    stored_gplus_id = login_session.get('gplus_id') # how can I view the values in credentials?
+    stored_credentials = login_session.get('credentials')
+    stored_gplus_id = login_session.get('gplus_id')
     if stored_credentials is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already connected'), 200)
         response.header['Content-Type'] = 'application/json'
@@ -116,6 +116,13 @@ def gconnect():
     login_session['username'] = data["name"]
     login_session['picture'] = data["picture"]
     login_session['email'] = data["email"]
+
+    # check if the user is in db. if not, create a new user
+    user_id = get_user_id(login_session['email'])
+    if not user_id:
+        user_id = create_user(login_session)
+    login_session['user_id'] = user_id
+
 
     output = ''
     output += '<h1>Welcome, '
@@ -173,7 +180,10 @@ def show_categories():
     categories = session.query(Category).all()
     # query last items filtering by date/time added
     items = session.query(Item).order_by(desc(Item.date_added)).limit(5).all()
-    return render_template('showCategories.html', categories=categories, items=items)
+    if 'username' not in login_session:
+        return render_template('publicCategories.html')
+    else:
+        return render_template('showCategories.html', categories=categories, items=items)
     # return "This will display list of categories"
 
 
@@ -190,9 +200,11 @@ def specific_category(category):
 @app.route('/category/add', methods=['GET', 'POST'])
 def add_category():
     '''Adds a new category'''
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
-        new_category_name = request.form['newCategoryName']
-        new_category = Category(name=new_category_name)
+        new_category = Category(name=request.form['newCategoryName'],
+                                user_id=login_session['user_id'])
         session.add(new_category)
         session.commit()
         return redirect(url_for('show_categories'))
@@ -204,6 +216,11 @@ def add_category():
 def edit_category(category_name):
     '''Edit a category'''
     category_to_edit = session.query(Category).filter_by(name=category_name).one()
+    # Alert message if not user who owns this
+    if category_to_edit.user_id != login_session['user_id']:
+        return "<script>function myFunction() {alert('You are not authorized to edit "\
+               "category. Please create one in order to edit.');}</script><body onload="\
+               "'myFunction()''>"
     if request.method == 'POST':
         category_to_edit.name = request.form['editedCategoryName']
         session.add(category_to_edit)
@@ -229,8 +246,12 @@ def delete_category(category_name):
 def specific_item(category, item):
     '''Show an item and its descripton'''
     category = session.query(Category).filter_by(name=category).one()
-    item = session.query(Item).filter_by(name=item).first()
-    return render_template('showItem.html', category=category, item=item)
+    item = session.query(Item).filter_by(name=item).one()
+    user = get_user_info(category.user_id)
+    if 'username' not in login_session or user.id != login_session['user_id']:
+        return render_template('publicItems.html')
+    else:
+        return render_template('showItem.html', category=category, item=item, user=user)
     # return "This will return item %s in category %s and its description" %(item, category)
 
 
@@ -242,7 +263,8 @@ def add_item(category):
         # pick item name and description from the form
         item_name = request.form['newItem']
         item_description = request.form['newItemDescription']
-        new_item = Item(name=item_name, description=item_description, category=category_selected)
+        new_item = Item(name=item_name, description=item_description, category=category_selected,
+                        user_id=category_selected.user_id)
         # add item to the db
         session.add(new_item)
         session.commit()
@@ -286,6 +308,32 @@ def delete_item(category, item):
                                item_to_delete=item_to_delete)
     # return "This will let you delete item %s in category %s and its description" \
     #         %(item, category)
+
+
+def get_user_id(email):
+    '''Takes an email and returns user if email exists in db'''
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
+def get_user_info(user_id):
+    '''Return user(object) information from the db'''
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def create_user(user):
+    '''Creates a new user and returns the user's id'''
+    new_user = User(name=user['username'], email=user['email'],
+                    picture=user['picture'])
+    session.add(new_user)
+    session.commit()
+    user = session.query(User).filter_by(email=user['email']).one
+    return user.id
+
 
 # Run application on localhost
 if __name__ == '__main__':
