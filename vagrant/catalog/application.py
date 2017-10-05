@@ -53,7 +53,7 @@ def do_login():
     return render_template('login.html', STATE=state)
     # return "The current session state is %s" %login_session['state']
 
-
+# when the
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     '''Checks and validates google login process to prevent fraud, among other things'''
@@ -65,8 +65,8 @@ def gconnect():
     try:
         # Upgrade authorization code into a credentials object
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-        oauth_flow.redirect_uri = 'postmessage'
-        credentials = oauth_flow.step2_exchange(code)
+        oauth_flow.redirect_uri = 'postmessage' #what does this mean/do?
+        credentials = oauth_flow.step2_exchange(code) #what does this mean/do?
         # if credentials is None:
         #     print "It is empty"
     except FlowExchangeError:
@@ -77,13 +77,13 @@ def gconnect():
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
     h = httplib2.Http()
-    result = json.loads(h.request(url, 'GET')[1])
+    result = json.loads(h.request(url, 'GET')[1]) # does the result contain the user information?
     # if the result has an error, abort
     if result.get('error') is not None:
         response = make_response(json.dumps(result.get('error'), 500))
         response.headers['Content-Type'] = 'application/json'
     # Verify that the access token is used for the intended user
-    gplus_id = credentials.id_token['sub']
+    gplus_id = credentials.id_token['sub'] # how can I view the values in credentials?
     if result['user_id'] != gplus_id:
         response = make_response(
             json.dumps("Token's user ID doesn't match given user ID"), 401)
@@ -96,8 +96,8 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     # Check if a user is already logged in
-    stored_credentials = login_session.get('credentials')
-    stored_gplus_id = login_session.get('gplus_id')
+    stored_credentials = login_session.get('credentials') # how can I view the values in credentials?
+    stored_gplus_id = login_session.get('gplus_id') # how can I view the values in credentials?
     if stored_credentials is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already connected'), 200)
         response.header['Content-Type'] = 'application/json'
@@ -110,7 +110,7 @@ def gconnect():
     userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
     params = {'access_token': credentials.access_token, 'alt': 'json'}
     answer = requests.get(userinfo_url, params=params)
-    data = json.loads(answer.text)
+    data = json.loads(answer.text) # this returns a dict, right?
 
     # save the preferred user data
     login_session['username'] = data["name"]
@@ -128,6 +128,41 @@ def gconnect():
               '150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;">'
     flash("you are now logged in as %s" %login_session['username'])
     return output
+
+
+@app.route('/gdisconnect', methods=['GET', 'POST'])
+def gdisconnect():
+    # Only disconnect a connected user
+    access_token = login_session.get('access_token')
+    # credentials = login_session.get('credentials') # how do we get these credentials? where did we store the login credentials in this app?
+    if access_token is None:
+        print 'Access Token is None'
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    # Use HTTP GET request to revoke the current user's access token
+    # access_token = credentials.access_token
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0] # why are we storing the first index? how can I see all the items returned
+
+    # check status of the response received in result
+    if result['status'] == '200':
+        del login_session['access_token']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+
+        # send response
+        response = make_response(json.dumps('Successfully disconnected user.'), 200) # I get a Current User not Connected
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        # if the token is Invalid
+        response = make_response(json.dumps('Failed to revoke token for a given user.'), 400)
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 
 @app.route('/')
