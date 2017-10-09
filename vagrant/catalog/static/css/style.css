@@ -1,0 +1,94 @@
+.navbar {
+    background: lightblue;
+}
+
+.navbar ul li a {
+    color: black !important;
+}
+
+.navbar .navbar-brand #item-logo {
+    color: red;
+    font-size: 30px;
+}
+
+.navbar .navbar-brand #catalog-logo {
+    color: darkblue;
+    font-size: 30px;
+}
+
+.main {
+    height: 170px;
+}
+
+.category-dropdown {
+    margin-left: 15%;
+}
+
+.category-dropdown .dropdown .btn {
+    margin-top: 10%;
+}
+
+.category-dropdown .dropdown .btn,
+.category-dropdown ul.dropdown-menu {
+    width: 80%;
+}
+
+.category-dropdown .dropdown .btn .caret {
+    float: right;
+    margin-top: 5px;
+}
+
+#display-items {
+    margin-top: 50px;
+}
+
+#display-items ul {
+    list-style-type: none;
+    padding: 0;
+    /*display: block;*/
+}
+
+#display-items li {
+    list-style: none;
+}
+
+#display-items ul li {
+    display: inline;
+}
+
+#display-items ul li a {
+    text-decoration: none;
+    color: black;
+}
+
+.edit-icon {
+    color: dodgerblue !important;
+}
+
+.delete-icon {
+    color: red !important;
+}
+
+
+/*#display-items ul li:hover~.edit1 {
+    display: inline;
+}*/
+
+
+/*#display-items .edit-delete .glyphicon {
+    display: none;
+}
+
+#display-items .edit-delete .glyphicon:hover {
+    display: inline;
+}*/
+
+
+/*#display-items a .glyphicon {
+    display: none;
+}*/
+
+
+/*#display-items a .edit1:hover {
+    display: inline;
+}*/
