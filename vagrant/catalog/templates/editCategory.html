@@ -1,27 +1,28 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
 
 <head>
     <title>Edit Category</title>
 </head>
 
-<body>
-    <!--edit item-->
-    <div>
-        <h5>Edit {{category_to_edit.name}} here</h5>
-        <form action="{{url_for('edit_category', category_name=category_to_edit.name)}}" method="POST">
+<body>-->
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+<!--edit item-->
+<div>
+    <h5>Edit {{category_to_edit.name}} here</h5>
+    <form action="{{url_for('edit_category', category_name=category_to_edit.name)}}" method="POST">
 
-            <p>Name:</p>
-            <input type="text" size="30" name="editedCategoryName" placeholder="{{category_to_edit.name}}">
+        <p>Name:</p>
+        <input type="text" size="30" name="editedCategoryName" placeholder="{{category_to_edit.name}}">
 
-            <input type="submit" value="Save">
+        <input type="submit" value="Save">
 
-            <a href="{{url_for('show_categories')}}">Cancel</a>
+        <a href="{{url_for('show_categories')}}">Cancel</a>
 
-        </form>
-    </div>
-    <br>
+    </form>
+</div>
+<br> {% endblock %}
 
-</body>
+<!--</body>
 
-</html>
+</html>-->

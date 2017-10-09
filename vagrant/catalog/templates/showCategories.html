@@ -1,67 +1,75 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
 
 <head>
     <title>Show Categories</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
+
 </head>
 
-<body>
-    <!--test out the category drop-down select form-->
-
-    <!--<form name="categories" action="" method="POST">
-        <div align="center">
-        <div>
-            <select id="select-categories">
-                <option value="" selected>Pick a Category</option>
+<body>-->
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+<!--dropdown menu for the categories-->
+<div class="col-lg-12 col-md-12 col-sm-12 main">
+    <div class="category-dropdown">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1 categoryDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Select a Category<span class="caret"></span>
+                </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 {% for category in categories %}
-                <option value="{{url_for('specific_category', category=category.name)}}">{{category.name}}</option>
-                <option value="www.google.com">{{category.name}}</option>
+                <li><a href="{{url_for('specific_category', category=category.name)}}">{{category.name}}</a></li>
                 {% endfor %}
-            </select>
+            </ul>
         </div>
-    </form>-->
-
-    <!--list categories-->
-    <div>
-        {% for category in categories %}
-        <a href="{{url_for('specific_category', category=category.name)}}">
-            <li>{{category.name}}</li>
-        </a>
-        <a href="{{url_for('edit_category', category_name=category.name)}}">
-            <h6>Edit</h6>
-        </a>
-        <a href="{{url_for('delete_category', category_name=category.name)}}">
-            <h6>Delete</h6>
-        </a>
-        <br> {% endfor %}
     </div>
-    <br>
-    <div>
-        <p>Latest Items</p>
-        {% for item in items %}
-        <li>{{item.name}} ({{item.category.name}})</li>
-        {% endfor %}
+</div>
+
+<div>
+    <div class="container">
+        <div id="display-items">
+
+            <h3>Latest Items</h3>
+
+            {% for item in items %}
+            <div class="inline-edit-delete">
+
+                <ul>
+                    <li>
+                        <a href="{{url_for('specific_item', category=item.category.name, item=item.name)}}">
+                                {{item.name}} ({{item.category.name}})
+                                </a>
+                    </li>
+                    <li>
+                        <a class="edit-icon" href="{{url_for('edit_item', category=item.category.name, item=item.name)}}">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="delete-icon" href="{{url_for('delete_item', category=item.category.name, item=item.name)}}">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+            {% endfor %}
+        </div>
     </div>
-    <br>
-    <!--Add category button-->
-    <div>
-        <a href="{{url_for('add_category')}}">Add New Category</a>
-    </div>
+</div>
 
+<script>
+    function userStatus(authResult) {
+        if (authResult['code']) {
+            // Hide the login button
+            $('#signinButton').attr('style', 'display:none');
+        }
+    }
+</script>
+<br> {% endblock %}
+<!--</body>
 
-    <!--js starts here-->
-    <!--from stackoverflow https://stackoverflow.com/questions/5150363/onchange-open-url-via-select-jquery-->
-    <!--<script>
-        $(function() {
-            // bind change event to select
-            $('#select-categories').on('change', function() {
-                var url = $(this).val(); // get the selected value
-                if (url) { // require a URL
-                    window.location = url; // redirect
-                }
-            });
-        });
-    </script>-->
-</body>
-
-</html>
+</html>-->

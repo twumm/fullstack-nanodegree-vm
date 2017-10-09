@@ -1,28 +1,31 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
 
 <head>
     <title>Show Categories Items</title>
 </head>
 
-<body>
-    <!--list categories-->
-    <div>
-        <h2>{{category.name}}</h2>
-        <br> {% for item in items %}
-        <a href="{{url_for('specific_item', category=category.name,  item=item.name)}}">
-            <li>{{item.name}}</li>
-        </a>
-        <a href="{{url_for('edit_item', category=category.name, item=item.name)}}">Edit</a>
-        <a href="{{url_for('delete_item', category=category.name, item=item.name)}}">Delete</a>
-        <br>
-        <br> {% endfor %}
+<body>-->
 
-    </div>
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+<!--list categories-->
+<div>
+    <h2>{{category.name}}</h2>
+    <br> {% for item in items %}
+    <a href="{{url_for('specific_item', category=category.name,  item=item.name)}}">
+        <li>{{item.name}}</li>
+    </a>
+    <a href="{{url_for('edit_item', category=category.name, item=item.name)}}">Edit</a>
+    <a href="{{url_for('delete_item', category=category.name, item=item.name)}}">Delete</a>
     <br>
-    <div>
-        <a href="{{url_for('add_item', category=category.name)}}">Add Item</a>
-    </div>
-</body>
+    <br> {% endfor %}
 
-</html>
+</div>
+<br>
+<div>
+    <a href="{{url_for('add_item', category=category.name)}}">Add Item</a>
+</div>
+{% endblock %}
+<!--</body>
+
+</html>-->

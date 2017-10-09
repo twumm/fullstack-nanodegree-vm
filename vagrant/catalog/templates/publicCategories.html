@@ -1,8 +1,73 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
 
-<head></head>
+<head>
+    <title>Show Categories</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="{{url_for('static', filename='js/bootstrap.min.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
 
-<body>This is a public categories page</body>
+</head>
 
-</html>
+<body>-->
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+<!--dropdown menu for the categories-->
+<p>for users who are not logged in</p>
+<div class="col-lg-12 col-md-12 col-sm-12 main">
+    <div class="category-dropdown">
+        <div class="dropdown">
+            <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1 categoryDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Select a Category<span class="caret"></span>
+                </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                {% for category in categories %}
+                <li><a href="{{url_for('specific_category', category=category.name)}}">{{category.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div>
+    <div class="container">
+        <div id="display-items">
+
+            <h3>Latest Items</h3>
+
+            {% for item in items %}
+            <div class="inline-edit-delete">
+
+                <ul>
+                    <li>
+                        <a href="{{url_for('specific_item', category=item.category.name, item=item.name)}}">
+                                {{item.name}} ({{item.category.name}})
+                                </a>
+                    </li>
+                    <li>
+                        <a class="edit-icon" href="{{url_for('edit_item', category=item.category.name, item=item.name)}}">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="delete-icon" href="{{url_for('delete_item', category=item.category.name, item=item.name)}}">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    $("#create-category, #logout-dropdown, .edit-icon, .delete-icon").css({
+        "display": "none"
+    });
+</script>
+<br> {% endblock %}
+<!--</body>
+
+</html>-->

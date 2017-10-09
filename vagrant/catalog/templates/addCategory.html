@@ -1,26 +1,26 @@
-<!DOCTYPE html>
+<!--<!DOCTYPE html>
 <html>
 
 <head>
     <title>Add New Category</title>
 </head>
 
-<body>
-    <!--add item-->
-    <div>
-        <h2>Enter the name of the new category</h2>
-        <form action="{{url_for('add_category')}}" method="POST">
+<body>-->
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+<!--add item-->
+<div>
+    <h2>Enter the name of the new category</h2>
+    <form action="{{url_for('add_category')}}" method="POST">
 
-            <p>Name:</p>
-            <input type="text" size="30" name="newCategoryName">
-            <input type="submit" value="Create">
+        <p>Name:</p>
+        <input type="text" size="30" name="newCategoryName">
+        <input type="submit" value="Create">
 
-            <a href="{{url_for('show_categories')}}">Cancel</a>
+        <a href="{{url_for('show_categories')}}">Cancel</a>
 
-        </form>
-    </div>
-    <br>
+    </form>
+</div>
+<br> {% endblock %}
+<!--</body>
 
-</body>
-
-</html>
+</html>-->
