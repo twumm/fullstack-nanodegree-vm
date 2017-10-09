@@ -176,10 +176,10 @@ def gdisconnect():
 # Login required function/decorator
 def login_required(f):
     # Checks if user is logged in
-    wraps(f)
+    @wraps(f)
     def check_user_status(*args, **kwargs):
         if 'username' not in login_session:
-            return redirect(url_for('do_login'))
+            return redirect('/login')
     return check_user_status
 
 # @login_required
@@ -192,11 +192,12 @@ def show_categories():
     # query last items filtering by date/time added
     items = session.query(Item).order_by(desc(Item.date_added)).limit(8).all()
     # commented out below to test front-end
-    if 'username' not in login_session:
+    '''if 'username' not in login_session:
         return render_template('publicCategories.html', categories=categories, items=items)
     else:
-        user = login_session
-        return render_template('showCategories.html', categories=categories, items=items, user=user)
+        user = login_session'''
+    user = login_session
+    return render_template('showCategories.html', categories=categories, items=items, user=user)
     # return "This will display list of categories"
 
 
@@ -209,7 +210,7 @@ def specific_category(category):
     return render_template('showSpecificCategory.html', category=category, items=items)
     # return "This will display list of category %s items" %(category)
 
-
+# @login_required
 @app.route('/category/add', methods=['GET', 'POST'])
 @login_required
 def add_category():
