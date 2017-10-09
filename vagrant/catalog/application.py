@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, g
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
@@ -16,6 +16,7 @@ import httplib2
 import json
 from flask import make_response
 import requests
+from functools import wraps
 
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
@@ -172,6 +173,16 @@ def gdisconnect():
         return response
 
 
+# Login required function/decorator
+def login_required(f):
+    # Checks if user is logged in
+    wraps(f)
+    def check_user_status(*args, **kwargs):
+        if 'username' not in login_session:
+            return redirect(url_for('do_login'))
+    return check_user_status
+
+# @login_required
 @app.route('/')
 @app.route('/category/')
 def show_categories():
@@ -179,11 +190,13 @@ def show_categories():
     # query categories
     categories = session.query(Category).all()
     # query last items filtering by date/time added
-    items = session.query(Item).order_by(desc(Item.date_added)).limit(5).all()
+    items = session.query(Item).order_by(desc(Item.date_added)).limit(8).all()
+    # commented out below to test front-end
     if 'username' not in login_session:
-        return render_template('publicCategories.html')
+        return render_template('publicCategories.html', categories=categories, items=items)
     else:
-        return render_template('showCategories.html', categories=categories, items=items)
+        user = login_session
+        return render_template('showCategories.html', categories=categories, items=items, user=user)
     # return "This will display list of categories"
 
 
@@ -198,10 +211,11 @@ def specific_category(category):
 
 
 @app.route('/category/add', methods=['GET', 'POST'])
+@login_required
 def add_category():
     '''Adds a new category'''
-    if 'username' not in login_session:
-        return redirect('/login')
+    '''if 'username' not in login_session:
+        return redirect('/login')'''
     if request.method == 'POST':
         new_category = Category(name=request.form['newCategoryName'],
                                 user_id=login_session['user_id'])
