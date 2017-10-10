@@ -14,7 +14,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(80), nullable=False)
     picture = Column(String(250))
-    email = Column(String(100))
+    email = Column(String(100), nullable=False)
 
 
 class Category(Base):
@@ -52,10 +52,11 @@ class Item(Base):
         '''Returns a json of the item requested'''
         return {
         'name': self.name,
-        'description': self.description
+        'description': self.description,
+        'date added' : self.date_added
     }
 
 
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('sqlite:///itemcatalogwithusers.db')
 
 Base.metadata.create_all(engine)
