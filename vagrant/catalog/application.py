@@ -285,8 +285,8 @@ def edit_category(category):
 @app.route('/category/<string:category>/delete/', methods=['GET', 'POST'])
 def delete_category(category):
     '''Delete a category'''
-    category_to_delete = session.query(Category).\
-                         filter_by(name=category).first()
+    category_to_delete = session.query(Category).
+    filter_by(name=category).first()
     user = login_session
     if category_to_delete.user_id != login_session['user_id']:
         return "<script>function myFunction() {alert( "\
@@ -303,9 +303,10 @@ def delete_category(category):
                                user=user)
 
 
-@app.route('/category/<string:category>/<string:item>',methods=['GET','POST'])
+@app.route('/category/<string:category>/<string:item>',
+           methods=['GET', 'POST'])
 def specific_item(category, item):
-    '''Show an item and its descripton'''
+    '''Shows an item and its descripton'''
     category = session.query(Category).filter_by(name=category).one()
     item = session.query(Item).filter_by(name=item).one()
     # user = get_user_info(category.user_id)
@@ -317,7 +318,8 @@ def specific_item(category, item):
     else:
         return render_template('showItem.html', category=category,
                                item=item, user=login_session)
-    # return "This will return item %s in category %s and its description" %(item, category)
+    # return "This will return item %s in category %s and
+    # its description" %(item, category)
 
 
 @app.route('/category/<string:category>/add', methods=['GET', 'POST'])
@@ -341,8 +343,8 @@ def add_item(category):
         return render_template('addItem.html',
                                category_selected=category_selected,
                                user=login_session)
-    # return "This will let you add item %s in category %s" %(item, category)
-
+    # return "This will let you add item %s in category %s"
+    # %(item, category)
 
 
 @app.route('/category/<string:category>/<string:item>/edit',
@@ -371,7 +373,8 @@ def edit_item(category, item):
         return render_template('editItem.html',
                                category_selected=category_selected,
                                item_to_edit=item_to_edit, user=login_session)
-    # return "This will let you edit item %s in category %s and its description" %(item, category)
+    # return "This will let you edit item %s in category %s and
+    # its description" %(item, category)
 
 
 @app.route('/category/<string:category>/<string:item>/delete',
@@ -397,8 +400,8 @@ def delete_item(category, item):
                                category_selected=category_selected,
                                item_to_delete=item_to_delete,
                                user=login_session)
-    # return "This will let you delete item %s in category %s and its description" \
-    #         %(item, category)
+    # return "This will let you delete item %s in category %s
+    # and its description" %(item, category)
 
 
 def get_user_id(email):
