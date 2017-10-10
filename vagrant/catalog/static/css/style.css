@@ -54,11 +54,12 @@
 
 #display-items ul li {
     display: inline;
+    font-size: 20px;
 }
 
 #display-items ul li a {
-    text-decoration: none;
-    color: black;
+    color: darkblue;
+    padding-right: 5px;
 }
 
 .edit-icon {
@@ -69,26 +70,11 @@
     color: red !important;
 }
 
-
-/*#display-items ul li:hover~.edit1 {
-    display: inline;
-}*/
-
-
-/*#display-items .edit-delete .glyphicon {
-    display: none;
+#display-categories ul li {
+    display: -webkit-inline-flex;
+    font-size: 15px;
 }
 
-#display-items .edit-delete .glyphicon:hover {
-    display: inline;
-}*/
-
-
-/*#display-items a .glyphicon {
-    display: none;
-}*/
-
-
-/*#display-items a .edit1:hover {
-    display: inline;
-}*/
+#signinButton {
+    margin: auto;
+}
