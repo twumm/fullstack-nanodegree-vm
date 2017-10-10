@@ -1,12 +1,3 @@
-<!--<!DOCTYPE html>
-<html>
-
-<head>
-    <title>Show Categories Items</title>
-</head>
-
-<body>-->
-
 {% extends "main.html" %} {% block content %} {% include "header.html" %}
 <!--list categories-->
 <div>
@@ -28,18 +19,7 @@
                                 {{item.name}}
                                 </a>
             </li>
-            <li>
-                <a class="edit-icon" href="{{url_for('edit_item', category=category.name, item=item.name)}}">
-                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                </a>
-            </li>
-            <li>
-                <a class="delete-icon" href="{{url_for('delete_item', category=category.name, item=item.name)}}">
-                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                </a>
-            </li>
         </ul>
-
         <br> {% endfor %}
     </div>
 
@@ -48,11 +28,8 @@
 <div>
 </div>
 <script>
-    $("#login").css({
+    $("#create-category, #logout-dropdown, .edit-icon, .delete-icon").css({
         "display": "none"
     });
 </script>
 {% endblock %}
-<!--</body>
-
-</html>-->

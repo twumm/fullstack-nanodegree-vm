@@ -7,11 +7,17 @@
 
 <body>-->
 {% extends "main.html" %} {% block content %} {% include "header.html" %}
-<h5>Are you sure you want to delete {{category_to_delete.name}}?</h5>
-<form action="{{url_for('delete_category', category_name=category_to_delete.name)}}" method="POST">
+<h3>Are you sure you want to delete {{category_to_delete.name}}?</h3>
+<form action="{{url_for('delete_category', category=category_to_delete.name)}}" method="POST">
     <input type="submit" value="Delete">
 </form>
-<a href="{{url_for('show_categories')}}">Cancel</a> {% endblock %}
+<a href="{{url_for('show_categories')}}">Cancel</a>
+<script>
+    $("#login").css({
+        "display": "none"
+    });
+</script>
+{% endblock %}
 <!--</body>
 
 </html>-->

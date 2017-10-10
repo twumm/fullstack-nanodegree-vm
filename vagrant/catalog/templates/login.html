@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html>
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
 
 <head>
     <title>Login</title>
@@ -7,49 +6,53 @@
     <script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
     <!--<script src="//apis.google.com/js/platform.js?onload=start"></script>-->
 </head>
+<!--<div class="row">-->
+<h4>Click to login</h4>
+<!--</div>-->
 
-<body>
-    <div id="signinButton">
-        <span class="g-signin" data-scope="openid email" data-clientid="1065858448744-lf18e9ibtoocfupdg8i5s45qmqhb5tmg.apps.googleusercontent.com" data-redirecturi="postmessage" data-accesstype="offline" data-cookiepolicy="single_host_origin" data-callback="signInCallback"
-            data-approvalprompt="force">
-        </span>
-    </div>
+<div id="signinButton">
+    <span class="g-signin" data-scope="openid email" data-clientid="1065858448744-lf18e9ibtoocfupdg8i5s45qmqhb5tmg.apps.googleusercontent.com" data-redirecturi="postmessage" data-accesstype="offline" data-cookiepolicy="single_host_origin" data-callback="signInCallback"
+        data-approvalprompt="force">
+            </span>
+</div>
 
-    <div id="result"></div>
+<div id="result"></div>
 
-    <script>
-        // what is in authResult? did we define it ourselves?
-        function signInCallback(authResult) {
-            if (authResult['code']) {
-                // Hide the login button
-                $('#signinButton').attr('style', 'display:none');
+<script>
+    // what is in authResult? did we define it ourselves?
+    function signInCallback(authResult) {
+        if (authResult['code']) {
+            // Hide the login button
+            $('#signinButton').attr('style', 'display:none');
 
-                // Send the one-time-use code to the server, if the server responds,
-                // write a 'login successful' message to the web page and then redirect
-                // back to the main category page
-                $.ajax({
-                    type: 'POST',
-                    url: '/gconnect?state={{STATE}}',
-                    processData: false,
-                    contentType: 'application/octet-stream; charset=utf-8',
-                    data: authResult['code'],
-                    success: function(result) {
-                        if (result) {
-                            $('#result').html('Login Successful!<br>' + result + '</br>Redirecting...')
-                            setTimeout(function() {
-                                window.location.href = "/category/";
-                            }, 4000);
-                        } else if (authResult['error']) {
-                            console.log('There was an error: ' + authResult['error'])
-                        } else {
-                            $('#result').html('Failed to make a server-side call. Check your configuration and console.');
-                        }
+            // Send the one-time-use code to the server, if the server responds,
+            // write a 'login successful' message to the web page and then redirect
+            // back to the main category page
+            $.ajax({
+                type: 'POST',
+                url: '/gconnect?state={{STATE}}',
+                processData: false,
+                contentType: 'application/octet-stream; charset=utf-8',
+                data: authResult['code'],
+                success: function(result) {
+                    if (result) {
+                        $('#result').html('Login Successful!<br>' + result + '</br>Redirecting...')
+                        setTimeout(function() {
+                            window.location.href = "/category/";
+                        }, 4000);
+                    } else if (authResult['error']) {
+                        console.log('There was an error: ' + authResult['error'])
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
                     }
-                })
-            }
+                }
+            })
         }
-    </script>
-</body>
-
-
-</html>
+    }
+</script>
+<script>
+    $("#create-category, #login, #logout").css({
+        "display": "none"
+    });
+</script>
+{% endblock %}

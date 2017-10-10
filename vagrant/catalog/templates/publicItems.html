@@ -1,8 +1,19 @@
-<!DOCTYPE html>
-<html>
+{% extends "main.html" %} {% block content %} {% include "header.html" %}
+<div>
+    <h2>{{category.name}}
+    </h2>
+    <br>
+    <h3>{{item.name}}</h3>
+    <p>{{item.description}}</p>
+</div>
+<br>
+<script>
+    $("#create-category, #logout-dropdown, .edit-icon, .delete-icon").css({
+        "display": "none"
+    });
+</script>
+{% endblock %}
 
-<head></head>
-
-<body>This is a public items page</body>
-
-</html>
+<!--</body>-->
+<!--
+</html>-->

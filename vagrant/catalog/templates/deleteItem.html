@@ -13,7 +13,13 @@
     <input type="submit" , value="Yes">
 </form>
 <a href="{{url_for('specific_category', category=category_selected.name)}}">No</a>
-<br> {% endblock %}
+<br>
+<script>
+    $("#login").css({
+        "display": "none"
+    });
+</script>
+{% endblock %}
 
 <!--</body>
 
