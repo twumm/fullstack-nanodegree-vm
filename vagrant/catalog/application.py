@@ -23,7 +23,11 @@ CLIENT_ID = json.loads(open('client_secrets.json', 'r').
                        read())['web']['client_id']
 
 # Connect to the database and create a db sessionmaker
-engine = create_engine('sqlite:///itemcatalogwithusers.db')
+engine = create_engine('postgres://gvnojbpchanxvs:6873e7b0f778be02ea62a'
+                       'de0e549eac0afa5fe4f6ea704a788c4d94c05ce1e27@ec2'
+                       '-23-23-93-255.compute-1.amazonaws.com:5432/deqf'
+                       '8tfcuf9813')
+
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -285,7 +289,7 @@ def edit_category(category):
 @app.route('/category/<string:category>/delete/', methods=['GET', 'POST'])
 def delete_category(category):
     '''Delete a category'''
-    category_to_delete = session.query(Category).
+    category_to_delete = session.query(Category).\
     filter_by(name=category).first()
     user = login_session
     if category_to_delete.user_id != login_session['user_id']:
@@ -430,7 +434,7 @@ def create_user(user):
 
 
 # Run application on localhost
-if __name__ == '__main__':
-    app.secret_key = 'super_secret_key'
-    app.debug = True
-    app.run(host='0.0.0.0', port=5000)
+# if __name__ == '__main__':
+app.secret_key = 'super_secret_key'
+app.debug = True
+    # app.run(host='0.0.0.0', port=5000)

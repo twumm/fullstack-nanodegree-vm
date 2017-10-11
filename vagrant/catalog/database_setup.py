@@ -25,6 +25,7 @@ class Category(Base):
     name = Column(String(80), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    items = relationship("Item", cascade="all, delete-orphan")
 
     @property
     def serialize(self):
@@ -40,7 +41,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
-    description = Column(String(250))
+    description = Column(String(1000))
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
@@ -57,6 +58,9 @@ class Item(Base):
     }
 
 
-engine = create_engine('sqlite:///itemcatalogwithusers.db')
+engine = create_engine('postgres://gvnojbpchanxvs:6873e7b0f778be02ea62a'
+                       'de0e549eac0afa5fe4f6ea704a788c4d94c05ce1e27@ec2'
+                       '-23-23-93-255.compute-1.amazonaws.com:5432/deqf'
+                       '8tfcuf9813')
 
 Base.metadata.create_all(engine)
