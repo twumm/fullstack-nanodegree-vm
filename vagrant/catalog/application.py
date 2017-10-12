@@ -82,8 +82,6 @@ def gconnect():
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
-        # if credentials is None:
-        #     print "It is empty"
     except FlowExchangeError:
         response = make_response(json.dumps('Failed to upgrade the '
                                             'authorization code'), 401)
@@ -110,7 +108,7 @@ def gconnect():
     if result['issued_to'] != CLIENT_ID:
         response = make_response(json.dumps("Token's client ID does not '\
                                 'match app's"), 401)
-        print "Token's client ID does not match app's."
+        print("Token's client ID does not match app's.")
         response.headers['Content-Type'] = 'application/json'
         return response
     # Check if a user is already logged in
@@ -162,7 +160,7 @@ def gdisconnect():
     # Only disconnect a connected user
     access_token = login_session.get('access_token')
     if access_token is None:
-        print 'Access Token is None'
+        print('Access Token is None')
         response = make_response(json.dumps('Current user not '
                                             'connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
